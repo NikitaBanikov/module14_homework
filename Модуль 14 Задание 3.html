@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #result {
+            display: flex;
+            flex-wrap: wrap;
+            width: 500px;
+        }
+
+        img {
+            margin: 5px;
+            width: 200px;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <input type="number" id="numberInput">
+    <button id="submitButton">Получить картинки</button>
+    <div id="result"></div>
+    
+ <script>
+    const numberInput = document.getElementById('numberInput');
+    const submitButton = document.getElementById('submitButton');
+    const result = document.getElementById('result');
+
+    submitButton.addEventListener('click', function() {
+    const number = parseInt(numberInput.value);
+    if (number >= 1 && number <= 10) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `https://picsum.photos/v2/list?limit=${numberInput}`, true);
+        xhr.onload = function() {
+        if (xhr.status === 200) {
+            const images = JSON.parse(xhr.response);
+            const fragment = document.createDocumentFragment();
+        for (let i = 0; i < images.length; i++) {
+          const img = document.createElement('img');
+          img.src = images[i].download_url;
+          fragment.appendChild(img);
+        }
+        result.innerHTML = '';
+        result.appendChild(fragment);
+      }
+    };
+    xhr.send();
+    } else {
+    result.innerHTML = 'Число вне диапазона от 1 до 10';
+    }
+});
+ </script>
+</body>
+</html>

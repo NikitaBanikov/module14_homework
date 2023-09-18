@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <label for="page-number">Номер страницы:</label>
+    <input id="page-number">
+    <label for="limit">Лимит:</label>
+    <input id="limit">
+    <button type="button" id="request">Запрос</button>
+    <div id="result"></div>
+
+    <script>
+        const button = document.getElementById("request");
+        const resultDiv = document.getElementById("result");
+
+        let lastPage = localStorage.getItem("lastPage") || 1;
+        let lastLimit = localStorage.getItem("lastLimit") || 10;
+
+        pageNumber.value = lastPage;
+        pageLimit.value = lastLimit;
+
+        const useRequest = (pageNumber, pageLimit) => {
+            return fetch(`https://picsum.photos/v2/list?page=${pageNumber}&limit=${pageLimit}`)
+             .then((response) => {
+                const images = JSON.parse(response);
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < images.length; i++) {
+                    const img = document.createElement('img');
+                    img.src = images[i].download_url;
+                    fragment.appendChild(img);
+                }
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(fragment);
+             })
+             .catch(() => {
+                console.log('error') 
+             });
+        }
+
+        button.addEventListener('click', async () => {
+            const pageNumber = parseInt(document.getElementById("page-number").value);
+            const pageLimit = parseInt(document.getElementById("limit").value);
+            if (pageNumber >= 1 && pageNumber <= 10 && isNaN(pageNumber)) {
+                resultDiv.innerHTML = 'Номер страницы вне диапазона от 1 до 10';
+            } else if (pageLimit >= 1 && pageLimit <= 10 && isNaN(pageLimit)) {
+                resultDiv.innerHTML = 'Лимит вне диапазона от 1 до 10';
+            } else if ((pageNumber >= 1 && pageNumber <= 10 && isNaN(pageNumber)) && (pageLimit >= 1 && pageLimit <= 10 && isNaN(pageLimit))) {
+                resultDiv.innerHTML = 'Номер страницы и лимит вне диапазона от 1 до 10';
+            } else {
+                const requestResult = await useRequest(pageNumber, pageLimit);
+                console.log(requestResult);
+                localStorage.setItem("lastPage", pageNumber);
+                localStorage.setItem("lastLimit", pageLimit);
+            }
+        })
+    </script>
+</body>
+</html>
